@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package vue;
 
 import java.awt.Color;
@@ -14,10 +8,6 @@ import java.util.Observer;
 import javax.swing.JPanel;
 import modele.FeuilleDessin;
 
-/**
- *
- * @author p1002239
- */
 public class PanelFeuilleDessin extends JPanel implements Observer
 {
     public PanelFeuilleDessin(FeuilleDessin feuilleDessin)
@@ -42,23 +32,13 @@ public class PanelFeuilleDessin extends JPanel implements Observer
         g.fillRect(0, 0, dim.width, dim.height);
         g.setColor(c);
 
-        showTurtles(g);
-    }
-
-    public void showTurtles(Graphics g)
-    {
         feuilleDessin.getTortues()
-                .forEach(t -> t.drawTurtle(g));
+                .forEach(t -> DrawableTortue.drawTortue(g, t));
     }
 
     @Override
     public void update(Observable o, Object arg)
     {
-        if(o == feuilleDessin)
-        {
-            
-        }
-        
         this.repaint();
     }
 }

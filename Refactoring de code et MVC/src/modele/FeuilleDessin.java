@@ -1,12 +1,6 @@
 package modele;
 
-// package logo;
-
-import left.*;
-import javax.swing.*;
-import java.awt.event.*;
 import java.util.*;
-import java.io.*;
 
 /**
  * Titre :        Logo
@@ -17,7 +11,7 @@ import java.io.*;
  * @version 2.0
  */
 
-public class FeuilleDessin extends Observable
+public class FeuilleDessin extends Observable implements Observer
 {
     /**
      * Liste des tortues enregistrées
@@ -31,12 +25,12 @@ public class FeuilleDessin extends Observable
         tortues = new ArrayList<>();
     }
 
-    public void addTortue(Tortue o)
+    public void addTortue(Tortue tortue)
     {
-        tortues.add(o);
+        tortues.add(tortue);
+        tortue.addObserver(this);
         
-        super.setChanged();
-        super.notifyObservers();
+        notifyChanged();
     }
 
     public List<Tortue> getTortues()
@@ -47,7 +41,16 @@ public class FeuilleDessin extends Observable
     public void reset()
     {
         tortues.forEach(t -> t.reset());
-        
+        notifyChanged();
+    }
+
+    @Override
+    public void update(Observable object, Object param)
+    {
+        notifyChanged();
+    }
+    protected void notifyChanged()
+    {
         super.setChanged();
         super.notifyObservers();
     }

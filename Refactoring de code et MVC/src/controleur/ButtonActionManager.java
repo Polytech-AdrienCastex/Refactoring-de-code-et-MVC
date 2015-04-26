@@ -1,22 +1,35 @@
 package controleur;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.JTextField;
-import left.Tortue;
 import modele.FeuilleDessin;
-import vue.PanelFeuilleDessin;
+import modele.Point;
+import modele.Tortue;
+import vue.IView;
 
 public class ButtonActionManager extends WindowAdapter implements ActionListener
 {
-    private FeuilleDessin feuille;
-    private PanelFeuilleDessin panelFeuilleDessin;
+    protected final FeuilleDessin feuille;
+    protected final Tortue courante;
     
-    private JTextField inputValue;
-    private Tortue courante;
+    private IView view;
+    
+    public ButtonActionManager()
+    {
+        feuille = new FeuilleDessin();
+        courante = new Tortue();
+        feuille.addTortue(courante);
+    }
+    
+    public void setView(IView view)
+    {
+        this.view = view;
+        
+        Point size = view.getFeuilleDessinSize();
+        courante.setPosition(size.x / 2, size.y / 2);
+    }
     
     
     @Override
@@ -29,37 +42,31 @@ public class ButtonActionManager extends WindowAdapter implements ActionListener
         
         switch(c.toLowerCase())
         {
-            case "avant":
+            case "avancer":
                 try
                 {
-                    courante.avancer(Integer.parseInt(inputValue.getText()));
+                    courante.avancer(view.getDistance());
                 }
                 catch (NumberFormatException ex)
-                {
-                    System.err.println("ce n'est pas un nombre : " + inputValue.getText());
-                }
+                { }
                 break;
                 
             case "droite":
                 try
                 {
-                    courante.droite(Integer.parseInt(inputValue.getText()));
+                    courante.droite(view.getDistance());
                 }
                 catch (NumberFormatException ex)
-                {
-                    System.err.println("ce n'est pas un nombre : " + inputValue.getText());
-                }
+                { }
                 break;
                 
             case "gauche":
                 try
                 {
-                    courante.gauche(Integer.parseInt(inputValue.getText()));
+                    courante.gauche(view.getDistance());
                 }
                 catch (NumberFormatException ex)
-                {
-                    System.err.println("ce n'est pas un nombre : " + inputValue.getText());
-                }
+                { }
                 break;
                 
             case "lever":
@@ -85,12 +92,16 @@ public class ButtonActionManager extends WindowAdapter implements ActionListener
             case "effacer":
                 feuille.reset();
                 
-                Dimension size = panelFeuilleDessin.getSize();
-                courante.setPosition(size.width/2, size.height/2);
+                Point size = view.getFeuilleDessinSize();
+                courante.setPosition(size.x / 2, size.y / 2);
                 break;
                 
             case "quitter":
                 System.exit(0);
+                break;
+                
+            case "color":
+                courante.setColor(view.getColor());
                 break;
         }
     }
