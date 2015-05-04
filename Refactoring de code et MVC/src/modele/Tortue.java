@@ -32,7 +32,9 @@ public class Tortue extends Observable
     protected boolean   crayon;     // par defaut on suppose qu'on dessine
     protected int       coul;
 
-
+    
+    
+    
     public List<Segment> getSegments()
     {
         return listSegments;
@@ -48,7 +50,7 @@ public class Tortue extends Observable
         return dir;
     }
 
-
+    
 
 
     // Methodes
@@ -58,14 +60,14 @@ public class Tortue extends Observable
     public Tortue()
     {
         listSegments = new ArrayList<>();
-
+        
         reset();
     }
 
     public void reset()
     {
         // on initialise la position de la tortue
-        location = new Point(0, 0);
+        setPosition(0, 0);
         dir = -90;
         coul = 0;
         crayon = true;
@@ -77,6 +79,10 @@ public class Tortue extends Observable
     {
         location = new Point(newX, newY);
         notifyChanges();
+    }
+    public void setPosition(Point p)
+    {
+        setPosition(p.x, p.y);
     }
 
 
@@ -101,7 +107,7 @@ public class Tortue extends Observable
             listSegments.add(seg);
         }
 
-        location = newLocation;
+        setPosition(newLocation);
         notifyChanges();
     }
 

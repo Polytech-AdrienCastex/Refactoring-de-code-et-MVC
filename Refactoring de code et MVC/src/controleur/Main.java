@@ -7,11 +7,14 @@ public class Main
 {
     public static void main(String[] args)
     {
-        ButtonActionManager actionManager = new ButtonActionManager();
+        JeuDeBalle actionManager = new JeuDeBalle(10);
         
         Window app = new Window(actionManager, actionManager.feuille);
         actionManager.setView(app);
+        actionManager.initialize();
         
         SwingUtilities.invokeLater(app);
+        
+        actionManager.run();
     }
 }

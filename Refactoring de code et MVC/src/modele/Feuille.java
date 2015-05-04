@@ -11,18 +11,30 @@ import java.util.*;
  * @version 2.0
  */
 
-public class FeuilleDessin extends Observable implements Observer
+public class Feuille extends Observable implements Observer
 {
     /**
      * Liste des tortues enregistrées
      */
-    private final List<Tortue> tortues;
+    private final Set<Tortue> tortues;
+    
+    private Tortue courrante = null;
+    
+    public void setSelectedTortue(Tortue t)
+    {
+        courrante = t;
+        notifyChanged("current");
+    }
+    public Tortue getTortueCourrante()
+    {
+        return courrante;
+    }
 
-    public FeuilleDessin()
+    public Feuille()
     {
         super();
 
-        tortues = new ArrayList<>();
+        tortues = new HashSet<>();
     }
 
     public void addTortue(Tortue tortue)
@@ -30,10 +42,13 @@ public class FeuilleDessin extends Observable implements Observer
         tortues.add(tortue);
         tortue.addObserver(this);
         
+        if(courrante == null)
+            setSelectedTortue(tortue);
+        
         notifyChanged();
     }
 
-    public List<Tortue> getTortues()
+    public Set<Tortue> getTortues()
     {
         return tortues;
     }
@@ -51,7 +66,11 @@ public class FeuilleDessin extends Observable implements Observer
     }
     protected void notifyChanged()
     {
+        notifyChanged(null);
+    }
+    protected void notifyChanged(String name)
+    {
         super.setChanged();
-        super.notifyObservers();
+        super.notifyObservers(name);
     }
 }

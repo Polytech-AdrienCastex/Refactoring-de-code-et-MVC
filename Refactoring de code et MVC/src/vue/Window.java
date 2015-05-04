@@ -3,9 +3,11 @@ package vue;
 import controleur.ButtonActionManager;
 import java.awt.*;
 import java.awt.event.*;
+import javafx.scene.layout.VBox;
 import javax.swing.*;
-import modele.FeuilleDessin;
+import modele.Feuille;
 import modele.Point;
+import modele.Tortue;
 
 
 /*************************************************************************
@@ -33,15 +35,18 @@ public class Window extends JFrame implements Runnable, IView
 
     private PanelFeuilleDessin panelFeuilleDessin;
     private JTextField inputValue;
+    private JTextField inputName;
     private JComboBox colorList;
+    private JList<Tortue> tortueList;
     
     protected final ButtonActionManager actionManager;
+    protected TortueCourranteManager tcm;
 
 
     /*+*********************************************
      *+* CONSTRUCTOR
      *+*********************************************/
-    public Window(ButtonActionManager actionManager, FeuilleDessin feuilleDessin)
+    public Window(ButtonActionManager actionManager, Feuille feuilleDessin)
     {
         super("un logo tout simple");
         
@@ -52,13 +57,12 @@ public class Window extends JFrame implements Runnable, IView
         addWindowListener(actionManager);
     }
     
-    
     /*+*********************************************
      *+* CREATIONS
      *+*********************************************/
-    private void initFeuilleDessin(FeuilleDessin feuilleDessin)
+    private void initFeuilleDessin(Feuille feuilleDessin)
     {
-        this.panelFeuilleDessin = new PanelFeuilleDessin(feuilleDessin);
+        this.panelFeuilleDessin = new PanelFeuilleDessin(feuilleDessin, actionManager, tortueList);
         this.panelFeuilleDessin.setBackground(Color.white);
         this.panelFeuilleDessin.setSize(new Dimension(600, 400));
         this.panelFeuilleDessin.setPreferredSize(new Dimension(600, 400));
@@ -90,6 +94,19 @@ public class Window extends JFrame implements Runnable, IView
         addPatternButton(parent, "Proc2");
         addPatternButton(parent, "Proc3");
     }
+    private void initRightPanel(JComponent parent, Feuille feuilleDessin)
+    {
+        tortueList = new JList<>();
+        tortueList.setAutoscrolls(true);
+        tortueList.setMaximumSize(new Dimension(10000, 150));
+        JScrollPane sp = new JScrollPane(tortueList);
+        sp.setAutoscrolls(true);
+        sp.setMaximumSize(new Dimension(10000, 150));
+        parent.add(sp);
+        
+        addButton(parent, "Ajouter ami", "Ajouter ami");
+        addButton(parent, "Supprimer ami",  "Supprimer ami");
+    }
     private void initTopButtons(JComponent parent)
     {
         addButton(parent, "Effacer", "Nouveau dessin", "/icons/index.png");
@@ -102,6 +119,12 @@ public class Window extends JFrame implements Runnable, IView
         addButton(parent, "Gauche",  "Gauche 45");
         addButton(parent, "Lever",   "Lever Crayon");
         addButton(parent, "Baisser", "Baisser Crayon");
+        addButton(parent, "Ajouter", "Ajouter tortue");
+        
+        parent.add(Box.createRigidArea(HGAP));
+        inputName = new JTextField("", 5);
+        parent.add(inputName);
+        addButton(parent, "Renommer", "Renommer tortue");
     }
     private void initColorComponent(JComponent parent)
     {
@@ -113,44 +136,55 @@ public class Window extends JFrame implements Runnable, IView
         parent.add(colorList);
     }
     
-    protected void initialization(FeuilleDessin feuilleDessin)
+    protected void initialization(Feuille feuilleDessin)
     {
-            getContentPane().setLayout(new BorderLayout(10,10));
+        getContentPane().setLayout(new BorderLayout(10,10));
 
-            // Top bar
-            JToolBar toolBar = new JToolBar();
-            
-            // Boutons
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.add(toolBar);
+        // Top bar
+        JToolBar toolBar = new JToolBar();
 
-            getContentPane().add(buttonPanel, "North");
-            initTopButtons(toolBar);
+        // Boutons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(toolBar);
 
-            // Create the combo box
-            toolBar.add(Box.createRigidArea(HGAP));
-            initColorComponent(toolBar);
+        getContentPane().add(buttonPanel, "North");
+        initTopButtons(toolBar);
 
-            // Menus
-            JMenuBar menubar = new JMenuBar();
-            setJMenuBar(menubar);	// on installe le menu bar
-            initMenus(menubar);
+        // Create the combo box
+        toolBar.add(Box.createRigidArea(HGAP));
+        initColorComponent(toolBar);
 
+        // Menus
+        JMenuBar menubar = new JMenuBar();
+        setJMenuBar(menubar);	// on installe le menu bar
+        initMenus(menubar);
 
-            // Les boutons du bas
-            JPanel p2 = new JPanel(new GridLayout());
-            initBottomButtons(p2);
+        // Le panel de droite
+        /*
+        JPanel p3 = new JPanel(new GridLayout());
+        initRightPanel(p3);
+        getContentPane().add(p3, "East");
+        */
+        Box b = Box.createVerticalBox();
+        initRightPanel(b, feuilleDessin);
+        getContentPane().add(b, "East");
 
-            getContentPane().add(p2, "South");
+        // Les boutons du bas
+        JPanel p2 = new JPanel(new GridLayout());
+        initBottomButtons(p2);
 
-            // Feuille de dessin
-            initFeuilleDessin(feuilleDessin);
-            getContentPane().add(this.panelFeuilleDessin, "Center");
+        getContentPane().add(p2, "South");
 
-            // Finitions
-            setDefaultCloseOperation(EXIT_ON_CLOSE);
-            pack();
-            setVisible(true);
+        // Feuille de dessin
+        initFeuilleDessin(feuilleDessin);
+        getContentPane().add(this.panelFeuilleDessin, "Center");
+
+        // Finitions
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        pack();
+        setVisible(true);
+        
+        tcm = new TortueCourranteManager(feuilleDessin, inputName, tortueList);
     }
 
     /*+*********************************************
@@ -249,5 +283,17 @@ public class Window extends JFrame implements Runnable, IView
     public Integer getColor()
     {
         return colorList.getSelectedIndex();
+    }
+
+    @Override
+    public String getTortueName()
+    {
+        return inputName.getText().trim();
+    }
+
+    @Override
+    public Tortue getSelectedFriend()
+    {
+        return tortueList.getSelectedValue();
     }
 }

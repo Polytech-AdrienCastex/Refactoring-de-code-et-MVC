@@ -2,39 +2,51 @@ package controleur;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import modele.FeuilleDessin;
+import modele.Feuille;
 import modele.Point;
 import modele.Tortue;
+import modele.TortueAmelioree;
 import vue.IView;
 
-public class ButtonActionManager extends WindowAdapter implements ActionListener
+public class ButtonActionManager extends WindowAdapter implements ActionListener, MouseListener
 {
-    protected final FeuilleDessin feuille;
-    protected final Tortue courante;
+    protected final Feuille feuille;
+    protected Tortue getCourrante()
+    {
+        return feuille.getTortueCourrante();
+    }
     
-    private IView view;
+    protected IView view;
     
     public ButtonActionManager()
     {
-        feuille = new FeuilleDessin();
-        courante = new Tortue();
-        feuille.addTortue(courante);
+        feuille = new Feuille();
     }
     
     public void setView(IView view)
     {
         this.view = view;
+    }
+    
+    public void initialize()
+    {
+        feuille.addTortue(new TortueAmelioree(view.getColor()));
         
         Point size = view.getFeuilleDessinSize();
-        courante.setPosition(size.x / 2, size.y / 2);
+        getCourrante().setPosition(size.x / 2, size.y / 2);
     }
     
     
     @Override
     public void actionPerformed(ActionEvent e)
     {
+        Point size;
+        Tortue t;
+        
         String c = e.getActionCommand();
 
         if(c == null)
@@ -45,7 +57,7 @@ public class ButtonActionManager extends WindowAdapter implements ActionListener
             case "avancer":
                 try
                 {
-                    courante.avancer(view.getDistance());
+                    getCourrante().avancer(view.getDistance());
                 }
                 catch (NumberFormatException ex)
                 { }
@@ -54,7 +66,7 @@ public class ButtonActionManager extends WindowAdapter implements ActionListener
             case "droite":
                 try
                 {
-                    courante.droite(view.getDistance());
+                    getCourrante().droite(view.getDistance());
                 }
                 catch (NumberFormatException ex)
                 { }
@@ -63,37 +75,37 @@ public class ButtonActionManager extends WindowAdapter implements ActionListener
             case "gauche":
                 try
                 {
-                    courante.gauche(view.getDistance());
+                    getCourrante().gauche(view.getDistance());
                 }
                 catch (NumberFormatException ex)
                 { }
                 break;
                 
             case "lever":
-                courante.leverCrayon();
+                getCourrante().leverCrayon();
                 break;
                 
             case "baisser":
-                courante.baisserCrayon();
+                getCourrante().baisserCrayon();
                 break;
                 
             case "proc1":
-                courante.carre();
+                getCourrante().carre();
                 break;
                 
             case "proc2":
-                courante.poly(60,8);
+                getCourrante().poly(60,8);
                 break;
                 
             case "proc3":
-                courante.spiral(50,40,6);
+                getCourrante().spiral(50,40,6);
                 break;
                 
             case "effacer":
                 feuille.reset();
                 
-                Point size = view.getFeuilleDessinSize();
-                courante.setPosition(size.x / 2, size.y / 2);
+                size = view.getFeuilleDessinSize();
+                getCourrante().setPosition(size.x / 2, size.y / 2);
                 break;
                 
             case "quitter":
@@ -101,7 +113,44 @@ public class ButtonActionManager extends WindowAdapter implements ActionListener
                 break;
                 
             case "color":
-                courante.setColor(view.getColor());
+                getCourrante().setColor(view.getColor());
+                break;
+                
+            case "ajouter":
+                t = new TortueAmelioree(view.getColor());
+                t.setColor(view.getColor());
+                size = view.getFeuilleDessinSize();
+                t.setPosition(size.x / 2, size.y / 2);
+                
+                feuille.addTortue(t);
+                feuille.setSelectedTortue(t);
+                break;
+                
+            case "renommer":
+                if(getCourrante() instanceof TortueAmelioree)
+                    ((TortueAmelioree)getCourrante()).setName(view.getTortueName());
+                break;
+                
+            case "ajouter ami":
+                t = view.getSelectedFriend();
+                if(t != null)
+                {
+                    if(getCourrante() instanceof TortueAmelioree)
+                        ((TortueAmelioree)getCourrante()).addTortue(t);
+                    if(t instanceof TortueAmelioree)
+                        ((TortueAmelioree)t).addTortue(getCourrante());
+                }
+                break;
+                
+            case "supprimer ami":
+                t = view.getSelectedFriend();
+                if(t != null)
+                {
+                    if(getCourrante() instanceof TortueAmelioree)
+                        ((TortueAmelioree)getCourrante()).removeTortue(t);
+                    if(t instanceof TortueAmelioree)
+                        ((TortueAmelioree)t).removeTortue(getCourrante());
+                }
                 break;
         }
     }
@@ -112,4 +161,51 @@ public class ButtonActionManager extends WindowAdapter implements ActionListener
         super.windowClosing(e);
         System.exit(0);
     }
+
+    @Override
+    public void mouseClicked(MouseEvent e)
+    {
+        Point p = new Point(e.getX(), e.getY());
+        
+        Tortue courrante = feuille.getTortueCourrante();
+        
+        Double min = feuille.getTortues()
+                .stream()
+                .filter(t -> !t.equals(courrante))
+                .mapToDouble(t -> t.getPosition().getDistance(p))
+                .min()
+                .orElse(-1.0);
+        
+        if(min.equals(-1.0))
+            return;
+        
+        Tortue selected = feuille.getTortues()
+                .stream()
+                .filter(t -> !t.equals(courrante))
+                .filter(t -> min.equals(t.getPosition().getDistance(p)))
+                .findFirst()
+                .orElse(null);
+        
+        if(selected != null)
+        {
+            feuille.setSelectedTortue(selected);
+            e.consume();
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e)
+    { }
+
+    @Override
+    public void mouseReleased(MouseEvent e)
+    { }
+
+    @Override
+    public void mouseEntered(MouseEvent e)
+    { }
+
+    @Override
+    public void mouseExited(MouseEvent e)
+    { }
 }

@@ -1,6 +1,7 @@
 package vue;
 
 import modele.Point;
+import modele.Tortue;
 
 public interface IView
 {
@@ -21,4 +22,8 @@ public interface IView
      * @return Integer
      */
     public Integer getColor();
+    
+    public String getTortueName();
+    
+    public Tortue getSelectedFriend();
 }
