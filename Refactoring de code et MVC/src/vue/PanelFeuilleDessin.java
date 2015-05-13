@@ -43,7 +43,7 @@ public class PanelFeuilleDessin extends JPanel implements Observer
 
         Tortue courrante = feuilleDessin.getTortueCourrante();
         feuilleDessin.getTortues()
-                .forEach(t -> tortueDrawer.drawTortue(g, t, courrante.equals(t)));
+                .forEach(t -> { synchronized(t) { tortueDrawer.drawTortue(g, t, courrante.equals(t)); }});
     }
 
     @Override

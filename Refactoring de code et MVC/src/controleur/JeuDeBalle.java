@@ -2,8 +2,7 @@ package controleur;
 
 import java.util.Random;
 import modele.Point;
-import modele.Tortue;
-import modele.TortueAmelioree;
+import modele.TortueBalle;
 
 public class JeuDeBalle extends ButtonActionManager implements Runnable
 {
@@ -22,9 +21,11 @@ public class JeuDeBalle extends ButtonActionManager implements Runnable
         
         for(int i = 0; i < nbUnits; i++)
         {
-            Tortue t = new TortueAmelioree(i);
+            TortueBalle t = new TortueBalle(i);
             t.setColor(i);
             t.setPosition(rnd.nextInt(size.x), rnd.nextInt(size.y));
+            if(i == 0)
+                t.setTheBall(true);
             feuille.addTortue(t);
         }
     }
@@ -50,19 +51,22 @@ public class JeuDeBalle extends ButtonActionManager implements Runnable
                     .filter(t -> !feuille.getTortueCourrante().equals(t))
                     .forEach(t ->
                     {
-                        switch(rnd.nextInt(3))
+                        synchronized(t)
                         {
-                            case 0:
-                                t.avancer(rnd.nextInt(50));
-                                break;
-                                
-                            case 1:
-                                t.droite(rnd.nextInt(360));
-                                break;
-                                
-                            case 2:
-                                t.gauche(rnd.nextInt(360));
-                                break;
+                            switch(rnd.nextInt(3))
+                            {
+                                case 0:
+                                    t.avancer(rnd.nextInt(50));
+                                    break;
+
+                                case 1:
+                                    t.droite(rnd.nextInt(360));
+                                    break;
+
+                                case 2:
+                                    t.gauche(rnd.nextInt(360));
+                                    break;
+                            }
                         }
                     });
         } while(true);

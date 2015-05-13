@@ -1,19 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package modele;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-/**
- *
- * @author p1002239
- */
 public class TortueAmelioree extends ColorableTortue
 {
     public TortueAmelioree(int bodyColor)

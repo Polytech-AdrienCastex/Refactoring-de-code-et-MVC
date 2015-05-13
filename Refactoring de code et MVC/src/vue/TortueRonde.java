@@ -14,8 +14,6 @@ public class TortueRonde extends TortueDrawer
     @Override
     protected Polygon getShape(Tortue tortue, boolean selected)
     {
-        Polygon circle = new Polygon();
-        
         Point center = tortue.getPosition();
         double r = Math.sqrt( rp*rp + rb*rb );
         
@@ -24,9 +22,6 @@ public class TortueRonde extends TortueDrawer
         else
             r /= 1.2;
         
-        for(int i = 0; i < 360; i++)
-            circle.addPoint(center.x + (int)(r * Math.cos(i * ratioDegRad)), center.y + (int)(r * Math.sin(i * ratioDegRad)));
-        
-        return circle;
+        return circle(center, r);
     }
 }
