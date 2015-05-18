@@ -40,8 +40,8 @@ public abstract class TortueDrawer
             return;
         
         // Dessine les segments
-        synchronized(tortue)
-        {
+        /*synchronized(tortue)
+        {*/
             tortue.getSegments()
                     .forEach(s -> DrawableSegment.drawSegment(graph, s));
 
@@ -69,10 +69,10 @@ public abstract class TortueDrawer
                 
                 if(tb.hasTheBall())
                 {
-                    graph.setColor(Color.green);
-                    graph.fillPolygon(circle(tb.getPosition(), 5));
+                    graph.setColor(Color.red);
+                    graph.fillPolygon(circle(tb.getPosition(), 4));
                 }
             }
-        }
+        //}
     }
 }

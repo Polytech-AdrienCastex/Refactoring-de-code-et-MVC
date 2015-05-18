@@ -110,6 +110,15 @@ public class Tortue extends Observable
         setPosition(newLocation);
         notifyChanges();
     }
+    
+    public Point nextPosition(int dist)
+    {
+        Point newLocation = new Point(
+                (int) Math.round(location.x+dist*Math.cos(ratioDegRad*dir)),
+                (int) Math.round(location.y+dist*Math.sin(ratioDegRad*dir)));
+
+        return newLocation;
+    }
 
     // aller a droite
     public void droite(int ang)

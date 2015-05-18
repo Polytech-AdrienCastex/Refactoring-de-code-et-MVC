@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import modele.Feuille;
@@ -20,7 +21,7 @@ public class PanelFeuilleDessin extends JPanel implements Observer
         this.feuilleDessin = feuilleDessin;
         this.feuilleDessin.addObserver(this);
         this.tortueList = tortueList;
-        this.tortueDrawer = new TortueRonde();
+        this.tortueDrawer = new TortueTriangle();
         
         this.addMouseListener(actionManager);
     }
@@ -42,14 +43,24 @@ public class PanelFeuilleDessin extends JPanel implements Observer
         g.setColor(c);
 
         Tortue courrante = feuilleDessin.getTortueCourrante();
-        feuilleDessin.getTortues()
-                .forEach(t -> { synchronized(t) { tortueDrawer.drawTortue(g, t, courrante.equals(t)); }});
+        
+        Set<Tortue> ts = feuilleDessin.getTortues();
+        synchronized(ts)
+        {
+            ts.forEach(t -> tortueDrawer.drawTortue(g, t, courrante.equals(t)));
+        }
     }
 
     @Override
     public void update(Observable o, Object arg)
     {
-        tortueList.setListData(feuilleDessin.getTortues().stream().toArray(Tortue[]::new));
+        Tortue[] tortues;
+        Set<Tortue> ts = feuilleDessin.getTortues();
+        synchronized(ts)
+        {
+            tortues = ts.stream().toArray(Tortue[]::new);
+        }
+        tortueList.setListData(tortues);
         this.repaint();
     }
 }

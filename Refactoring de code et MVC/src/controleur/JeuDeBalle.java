@@ -1,7 +1,10 @@
 package controleur;
 
+import java.awt.event.ActionEvent;
 import java.util.Random;
 import modele.Point;
+import modele.Tortue;
+import modele.TortueAmelioree;
 import modele.TortueBalle;
 
 public class JeuDeBalle extends ButtonActionManager implements Runnable
@@ -28,6 +31,17 @@ public class JeuDeBalle extends ButtonActionManager implements Runnable
                 t.setTheBall(true);
             feuille.addTortue(t);
         }
+        
+        feuille.getTortues()
+                .stream()
+                .map(t -> (TortueAmelioree)t)
+                .forEach(t -> feuille.getTortues().stream()
+                        .filter(ts -> !ts.equals(t))
+                        .forEach(ts -> t.addTortue(ts)));
+        
+        feuille.getTortues()
+                .stream()
+                .forEach(t -> t.leverCrayon());
     }
     
     @Override
@@ -46,6 +60,7 @@ public class JeuDeBalle extends ButtonActionManager implements Runnable
                 return;
             }
 
+            final Point size = view.getFeuilleDessinSize();
             feuille.getTortues()
                     .stream()
                     .filter(t -> !feuille.getTortueCourrante().equals(t))
@@ -53,22 +68,39 @@ public class JeuDeBalle extends ButtonActionManager implements Runnable
                     {
                         synchronized(t)
                         {
-                            switch(rnd.nextInt(3))
+                            switch(rnd.nextInt(2))
                             {
                                 case 0:
-                                    t.avancer(rnd.nextInt(50));
+                                    int av = rnd.nextInt(7) + 1;
+                                    Point nextPos = t.nextPosition(av);
+                                    if(nextPos.x > 0 && nextPos.x < size.x && nextPos.y > 0 && nextPos.y < size.y)
+                                        t.avancer(av);
                                     break;
 
                                 case 1:
                                     t.droite(rnd.nextInt(360));
                                     break;
-
-                                case 2:
-                                    t.gauche(rnd.nextInt(360));
-                                    break;
                             }
                         }
                     });
         } while(true);
+    }
+    
+    
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+        String c = e.getActionCommand();
+
+        if(c == null)
+            return;
+        
+        switch(c.toLowerCase())
+        {
+            case "lancer":
+                Thread th = new Thread(this);
+                th.start();
+                break;
+        }
     }
 }

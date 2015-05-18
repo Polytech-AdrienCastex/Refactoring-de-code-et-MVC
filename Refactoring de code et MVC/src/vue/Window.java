@@ -120,6 +120,7 @@ public class Window extends JFrame implements Runnable, IView
         addButton(parent, "Lever",   "Lever Crayon");
         addButton(parent, "Baisser", "Baisser Crayon");
         addButton(parent, "Ajouter", "Ajouter tortue");
+        addButton(parent, "Lancer", "Lancer le match");
         
         parent.add(Box.createRigidArea(HGAP));
         inputName = new JTextField("", 5);
@@ -160,11 +161,6 @@ public class Window extends JFrame implements Runnable, IView
         initMenus(menubar);
 
         // Le panel de droite
-        /*
-        JPanel p3 = new JPanel(new GridLayout());
-        initRightPanel(p3);
-        getContentPane().add(p3, "East");
-        */
         Box b = Box.createVerticalBox();
         initRightPanel(b, feuilleDessin);
         getContentPane().add(b, "East");
