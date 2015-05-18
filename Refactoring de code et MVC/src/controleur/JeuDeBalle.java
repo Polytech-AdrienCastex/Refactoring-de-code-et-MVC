@@ -90,6 +90,8 @@ public class JeuDeBalle extends ButtonActionManager implements Runnable
     @Override
     public void actionPerformed(ActionEvent e)
     {
+        super.actionPerformed(e);
+        
         String c = e.getActionCommand();
 
         if(c == null)
