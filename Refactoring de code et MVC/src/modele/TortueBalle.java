@@ -53,7 +53,7 @@ public class TortueBalle extends TortueAmelioree
                         .findAny()
                         .ifPresent(t ->
                         {
-                            System.out.println("Prend la balle " + t + "!");
+                            System.out.println("Prends la balle " + t + "!");
                             t.setTheBall(true);
                             this.setTheBall(false);
                         });
