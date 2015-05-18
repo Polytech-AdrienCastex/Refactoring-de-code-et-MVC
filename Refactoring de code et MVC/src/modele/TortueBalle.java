@@ -2,7 +2,8 @@ package modele;
 
 public class TortueBalle extends TortueAmelioree
 {
-    private final long MIN_BALL_OWNING_TIME = 1000; // ms
+    public static final long MIN_BALL_OWNING_TIME = 1000; // ms
+    public static final int BALL_SHARING_DISTANCE = 50;
     
     public TortueBalle(int bodyColor)
     {
@@ -46,10 +47,10 @@ public class TortueBalle extends TortueAmelioree
             synchronized(connaissances)
             {
                 connaissances.stream()
-                        .filter(t -> this.distance(t) <= 50)
+                        .filter(t -> this.distance(t) <= BALL_SHARING_DISTANCE)
                         .filter(t -> t instanceof TortueBalle)
                         .map(t -> (TortueBalle)t)
-                        .findFirst()
+                        .findAny()
                         .ifPresent(t ->
                         {
                             System.out.println("Prend la balle " + t + "!");

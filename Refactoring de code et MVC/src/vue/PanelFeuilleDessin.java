@@ -21,7 +21,7 @@ public class PanelFeuilleDessin extends JPanel implements Observer
         this.feuilleDessin = feuilleDessin;
         this.feuilleDessin.addObserver(this);
         this.tortueList = tortueList;
-        this.tortueDrawer = new TortueTriangle();
+        this.tortueDrawer = new TortueRonde(); // Choose between : TortueTriangle and TortueRonde
         
         this.addMouseListener(actionManager);
     }

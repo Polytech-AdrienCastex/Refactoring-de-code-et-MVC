@@ -38,41 +38,34 @@ public abstract class TortueDrawer
     {
         if (graph == null)
             return;
-        
-        // Dessine les segments
-        /*synchronized(tortue)
-        {*/
-            tortue.getSegments()
-                    .forEach(s -> DrawableSegment.drawSegment(graph, s));
 
-            //Calcule les 3 coins du triangle a partir de
-            // la position de la tortue p
-            Point p = tortue.getPosition();
+        tortue.getSegments()
+                .forEach(s -> DrawableSegment.drawSegment(graph, s));
 
+        Point p = tortue.getPosition();
 
-            if(tortue instanceof ColorableTortue)
-                graph.setColor(ColorManager.getColor(((ColorableTortue)tortue).getBodyColor()));
-            else
-                graph.setColor(Color.green);
-            graph.fillPolygon(getShape(tortue, selected));
+        if(tortue instanceof ColorableTortue)
+            graph.setColor(ColorManager.getColor(((ColorableTortue)tortue).getBodyColor()));
+        else
+            graph.setColor(Color.green);
+        graph.fillPolygon(getShape(tortue, selected));
 
-            if(tortue instanceof TortueAmelioree)
+        if(tortue instanceof TortueAmelioree)
+        {
+            FontMetrics m = graph.getFontMetrics();
+            String text = tortue.toString();
+            graph.drawString(text, p.x - m.stringWidth(text) / 2, p.y + m.getHeight() + 5);
+        }
+
+        if(tortue instanceof TortueBalle)
+        {
+            TortueBalle tb = (TortueBalle)tortue;
+
+            if(tb.hasTheBall())
             {
-                FontMetrics m = graph.getFontMetrics();
-                String text = tortue.toString();
-                graph.drawString(text, p.x - m.stringWidth(text) / 2, p.y + m.getHeight() + 5);
+                graph.setColor(Color.red);
+                graph.fillPolygon(circle(tb.getPosition(), 4));
             }
-            
-            if(tortue instanceof TortueBalle)
-            {
-                TortueBalle tb = (TortueBalle)tortue;
-                
-                if(tb.hasTheBall())
-                {
-                    graph.setColor(Color.red);
-                    graph.fillPolygon(circle(tb.getPosition(), 4));
-                }
-            }
-        //}
+        }
     }
 }
